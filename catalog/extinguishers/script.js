@@ -7,7 +7,7 @@ const checkBtn = document.getElementById('checkBtn');
 
 let score = 0;
 let placedCount = 0;
-const targetCount = 2; // Нужно поставить 2 штуки
+const targetCount = 2;
 
 function updateUI() {
   scoreEl.textContent = score;
@@ -21,18 +21,20 @@ function placeExtinguisher(data, x, y) {
   }
 
   const rect = room.getBoundingClientRect();
-  const heightInPixels = 400 - 40 - y; 
-  const heightMeters = heightInPixels * 0.01; 
-  const maxAllowedHeight = 1.5; 
   
-  if (heightMeters > maxAllowedHeight) {
+  // Пол начинается с 30px от низа. Считаем высоту от пола.
+  // Условно: 100px = 1 метр (тогда 1.5 метра = 150px)
+  const heightInPixels = 400 - 30 - y; 
+  const heightMeters = heightInPixels / 100; 
+  
+  if (heightMeters > 1.5) {
     showStatus(`❌ Нарушение! Вешать выше 1.5 м нельзя. (Высота: ${heightMeters.toFixed(1)} м)`, 'error');
     return;
   }
   
-  const distanceToDoor = Math.sqrt(Math.pow(x - (rect.width * 0.4 + 40), 2) + Math.pow(y - (400 - 40), 2));
-  if (distanceToDoor < 50) {
-    showStatus(`❌ Нарушение! Нельзя ставить прямо на дверь.`, 'error');
+  // Проверка на дверь (дверь от 30px до 210px от низа, центр около 120px)
+  if (x > rect.width * 0.4 - 20 && x < rect.width * 0.4 + 100 && y > 400 - 210 && y < 400 - 30) {
+    showStatus(`❌ Нарушение! Нельзя ставить прямо на дверной проем.`, 'error');
     return;
   }
 
@@ -53,7 +55,7 @@ function placeExtinguisher(data, x, y) {
   room.appendChild(el);
   placedCount++;
   updateUI();
-  showStatus(`✅ Поставлен. Осталось: ${targetCount - placedCount}`, 'success');
+  showStatus(`✅ Поставлен на высоте ${heightMeters.toFixed(1)} м. Осталось: ${targetCount - placedCount}`, 'success');
 }
 
 // --- ПК (Drag and Drop) ---
@@ -80,7 +82,7 @@ inventoryItems.forEach(item => {
     inventoryItems.forEach(i => i.style.borderColor = '#fdecea');
     item.style.borderColor = '#e53935';
     selectedItem = { type: item.dataset.type, weight: item.dataset.weight };
-    showStatus('Выбран! Тапните по комнате.', 'info');
+    showStatus('Выбран! Тапните по стене.', 'info');
   });
 });
 
@@ -99,12 +101,12 @@ checkBtn.addEventListener('click', () => {
   }
   
   if (placedCount === targetCount) {
-    score += 50; // Даем 50 очков за выполнение
+    score += 50;
     updateUI();
     showStatus('🎉 Задание выполнено! Вы заработали 50 очков. Игра пройдена!', 'success');
     checkBtn.textContent = 'Игра пройдена!';
-    checkBtn.style.background = '#2e7d32'; // Зеленая
-    checkBtn.disabled = true; // Блокируем кнопку
+    checkBtn.style.background = '#2e7d32';
+    checkBtn.disabled = true;
   } else {
     showStatus(`❌ Вы поставили только ${placedCount} из ${targetCount} огнетушителей.`, 'error');
   }
@@ -118,5 +120,4 @@ function showStatus(msg, type) {
   else statusPanel.style.color = '#6b7a90';
 }
 
-// Инициализация
 updateUI();
