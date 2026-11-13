@@ -2,7 +2,7 @@ const canvas = document.getElementById('canvas');
 const contentLayer = document.getElementById('content-layer');
 const clearBtn = document.getElementById('clearBtn');
 
-const GRID_SIZE = 40; // Размер клетки
+const GRID_SIZE = 40;
 
 function snap(value) {
   return Math.round(value / GRID_SIZE) * GRID_SIZE;
@@ -13,7 +13,6 @@ document.querySelectorAll('.tool').forEach(tool => {
     const type = tool.dataset.type;
     const sign = tool.dataset.sign;
     
-    // Появление в центре, привязанном к сетке
     const centerX = snap(canvas.clientWidth / 2);
     const centerY = snap(canvas.clientHeight / 2);
 
@@ -25,6 +24,7 @@ document.querySelectorAll('.tool').forEach(tool => {
   });
 });
 
+// ... (функция createWall остается без изменений, не трогаем её) ...
 function createWall(x, y, orientation) {
   const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
   const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -57,7 +57,6 @@ function createWall(x, y, orientation) {
   g.appendChild(handle);
   contentLayer.appendChild(g);
   
-  // Перемещение
   rect.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
     const startX = e.clientX;
@@ -68,8 +67,6 @@ function createWall(x, y, orientation) {
     function onMove(e) {
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
-      
-      // Прилипаем к сетке
       const newX = snap(origX + dx);
       const newY = snap(origY + dy);
       
@@ -94,7 +91,6 @@ function createWall(x, y, orientation) {
     window.addEventListener('pointerup', onUp);
   });
 
-  // Растягивание
   handle.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
     const startX = e.clientX;
@@ -130,32 +126,40 @@ function createWall(x, y, orientation) {
   });
 }
 
+// --- ОБНОВЛЕННАЯ ФУНКЦИЯ СОЗДАНИЯ ЗНАКА ---
 function createSign(x, y, signType) {
-  const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-  text.setAttribute("class", "sign");
-  text.setAttribute("x", x);
-  text.setAttribute("y", y);
+  const image = document.createElementNS("http://www.w3.org/2000/svg", "image");
   
-  let symbol = '❓';
-  if (signType === 'exit') symbol = '🚪';
-  if (signType === 'extinguisher') symbol = '🧯';
+  // Если это огнетушитель, используем наш SVG-файл
+  if (signType === 'extinguisher') {
+    image.setAttribute("href", "extinguisher.svg");
+  } else {
+    // Для остальных пока заглушка (или можно добавить другие SVG)
+    image.setAttribute("href", "extinguisher.svg"); 
+  }
   
-  text.textContent = symbol;
-  contentLayer.appendChild(text);
+  image.setAttribute("class", "sign-img");
+  image.setAttribute("x", x - 15); // Центрируем по клику
+  image.setAttribute("y", y - 15);
+  image.setAttribute("width", "30");
+  image.setAttribute("height", "30");
+  image.setAttribute("style", "cursor: move;");
 
-  text.addEventListener('pointerdown', (e) => {
+  contentLayer.appendChild(image);
+
+  image.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
     const startX = e.clientX;
     const startY = e.clientY;
-    const origX = parseFloat(text.getAttribute("x"));
-    const origY = parseFloat(text.getAttribute("y"));
+    const origX = parseFloat(image.getAttribute("x"));
+    const origY = parseFloat(image.getAttribute("y"));
 
     function onMove(e) {
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
       
-      text.setAttribute("x", snap(origX + dx));
-      text.setAttribute("y", snap(origY + dy));
+      image.setAttribute("x", snap(origX + dx));
+      image.setAttribute("y", snap(origY + dy));
     }
 
     function onUp() {
