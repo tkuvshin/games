@@ -11,8 +11,13 @@
     <header class="game-header">
       <a href="../../index.html" class="back-btn">← Назад в каталог</a>
       <h1>Расставь огнетушители</h1>
-      <p>На ПК перетащите мышкой. На телефоне — нажмите на огнетушитель, чтобы поставить его.</p>
+      <p>Задача: поставьте <b>2 огнетушителя ОП-4</b> на высоту <b>не более 1.5 м</b>, не загораживая дверь.</p>
     </header>
+
+    <!-- Новая панель с заданием и очками -->
+    <div style="background: #e3f2fd; padding: 15px; border-radius: 12px; margin-bottom: 20px; text-align: center; font-weight: bold; color: #1565c0;">
+      Очки: <span id="score">0</span> | Осталось поставить: <span id="remaining">2</span>
+    </div>
 
     <div class="game-area">
       <div class="room" id="room">
@@ -23,17 +28,17 @@
       <div class="inventory" id="inventory">
         <h2>Склад:</h2>
         <div class="items">
-          <div class="extinguisher" draggable="true" data-type="light" data-weight="4">
+          <div class="extinguisher" data-type="light" data-weight="4">
             <span>🧯</span> ОП-4 (4 кг)
-          </div>
-          <div class="extinguisher" draggable="true" data-type="heavy" data-weight="9">
-            <span>🧯</span> ОП-9 (9 кг)
           </div>
         </div>
       </div>
     </div>
 
     <div class="status-panel" id="status">Перетащите или нажмите на огнетушитель</div>
+    
+    <!-- Кнопка проверки -->
+    <button id="checkBtn" style="width: 100%; padding: 15px; margin-top: 15px; background: #e53935; color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer;">Проверить результат</button>
   </div>
   <script src="script.js"></script>
 </body>
