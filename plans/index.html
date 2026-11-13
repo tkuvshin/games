@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Конструктор планов эвакуации</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <h1>Конструктор планов эвакуации</h1>
+      <p>Соберите план из заготовок и расставьте знаки. Толщина стен фиксирована.</p>
+    </header>
+
+    <div class="main-area">
+      <!-- Палитра -->
+      <aside class="palette">
+        <h3>Стены</h3>
+        <div class="wall-tools">
+          <div class="tool wall-h" draggable="true" data-type="wall-h">Стена (Гор.)</div>
+          <div class="tool wall-v" draggable="true" data-type="wall-v">Стена (Верт.)</div>
+        </div>
+        
+        <h3>Знаки</h3>
+        <div class="sign-tools">
+          <div class="tool sign-exit" draggable="true" data-type="sign" data-sign="exit">🚪 Выход</div>
+          <div class="tool sign-ext" draggable="true" data-type="sign" data-sign="extinguisher">🧯 Огнетушитель</div>
+          <div class="tool sign-phone" draggable="true" data-type="sign" data-sign="phone">📞 Телефон</div>
+        </div>
+      </aside>
+
+      <!-- Рабочая область -->
+      <main class="workspace">
+        <svg id="canvas" width="100%" height="600" style="background: #fff; border: 1px solid #ccc;">
+          <!-- Сюда будут добавляться элементы -->
+          <g id="grid-layer"></g>
+          <g id="content-layer"></g>
+        </svg>
+      </main>
+    </div>
+    
+    <div class="status-bar">
+      <button id="clearBtn" style="background: #e53935; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Очистить холст</button>
+      <span>Толщина стен: 4 мм (условно)</span>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
