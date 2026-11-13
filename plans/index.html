@@ -10,7 +10,7 @@
   <div class="app-container">
     <header>
       <h1>Конструктор планов эвакуации</h1>
-      <p>Соберите план из заготовок и расставьте знаки. Толщина стен фиксирована.</p>
+      <p>Сетка = 1 метр (условно). Толщина стен фиксирована (4 мм).</p>
     </header>
 
     <div class="main-area">
@@ -18,23 +18,33 @@
       <aside class="palette">
         <h3>Стены</h3>
         <div class="wall-tools">
-          <div class="tool wall-h" draggable="true" data-type="wall-h">Стена (Гор.)</div>
-          <div class="tool wall-v" draggable="true" data-type="wall-v">Стена (Верт.)</div>
+          <div class="tool wall-h" data-type="wall-h">Стена (Гор.)</div>
+          <div class="tool wall-v" data-type="wall-v">Стена (Верт.)</div>
         </div>
         
         <h3>Знаки</h3>
         <div class="sign-tools">
-          <div class="tool sign-exit" draggable="true" data-type="sign" data-sign="exit">🚪 Выход</div>
-          <div class="tool sign-ext" draggable="true" data-type="sign" data-sign="extinguisher">🧯 Огнетушитель</div>
-          <div class="tool sign-phone" draggable="true" data-type="sign" data-sign="phone">📞 Телефон</div>
+          <!-- Тут мы заменим эмодзи на SVG-иконки (пока оставим текст для примера) -->
+          <div class="tool sign-exit" data-type="sign" data-sign="exit">
+            <svg width="24" height="24" viewBox="0 0 24 24"><path fill="green" d="M10 17l5-5-5-5v3H3v4h7v3zM20 4H4v16h16V4z"/></svg> Выход
+          </div>
+          <div class="tool sign-ext" data-type="sign" data-sign="extinguisher">
+             <svg width="24" height="24" viewBox="0 0 24 24"><path fill="red" d="M19 6h-2V4c0-1.1-.9-2-2-2h-6c-1.1 0-2 .9-2 2v2H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-8-2h2v2h-2V4z"/></svg> Огнетушитель
+          </div>
         </div>
       </aside>
 
       <!-- Рабочая область -->
       <main class="workspace">
-        <svg id="canvas" width="100%" height="600" style="background: #fff; border: 1px solid #ccc;">
-          <!-- Сюда будут добавляться элементы -->
-          <g id="grid-layer"></g>
+        <svg id="canvas" width="100%" height="600">
+          <!-- Сетка -->
+          <defs>
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+          
           <g id="content-layer"></g>
         </svg>
       </main>
@@ -42,7 +52,7 @@
     
     <div class="status-bar">
       <button id="clearBtn" style="background: #e53935; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Очистить холст</button>
-      <span>Толщина стен: 4 мм (условно)</span>
+      <span>Сетка: 1 клетка = 1 метр</span>
     </div>
   </div>
   <script src="script.js"></script>
