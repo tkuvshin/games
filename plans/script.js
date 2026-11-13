@@ -2,15 +2,20 @@ const canvas = document.getElementById('canvas');
 const contentLayer = document.getElementById('content-layer');
 const clearBtn = document.getElementById('clearBtn');
 
-// --- Клик по инструменту -> появление элемента на холсте ---
+const GRID_SIZE = 40; // Размер клетки
+
+function snap(value) {
+  return Math.round(value / GRID_SIZE) * GRID_SIZE;
+}
+
 document.querySelectorAll('.tool').forEach(tool => {
   tool.addEventListener('click', () => {
     const type = tool.dataset.type;
     const sign = tool.dataset.sign;
-
-    // Центр холста (с небольшим смещением, чтобы элементы не накладывались друг на друга)
-    const centerX = canvas.clientWidth / 2 + (Math.random() * 100 - 50);
-    const centerY = canvas.clientHeight / 2 + (Math.random() * 100 - 50);
+    
+    // Появление в центре, привязанном к сетке
+    const centerX = snap(canvas.clientWidth / 2);
+    const centerY = snap(canvas.clientHeight / 2);
 
     if (type === 'wall-h' || type === 'wall-v') {
       createWall(centerX, centerY, type);
@@ -20,43 +25,39 @@ document.querySelectorAll('.tool').forEach(tool => {
   });
 });
 
-// --- Создание стены ---
 function createWall(x, y, orientation) {
   const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-  g.setAttribute("class", "wall-group");
-  
   const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
   rect.setAttribute("class", "wall");
   
   if (orientation === 'wall-h') {
-    rect.setAttribute("width", "100");
-    rect.setAttribute("height", "6"); // Толщина 6px
+    rect.setAttribute("width", GRID_SIZE * 2); 
+    rect.setAttribute("height", "6");
   } else {
     rect.setAttribute("width", "6");
-    rect.setAttribute("height", "100");
+    rect.setAttribute("height", GRID_SIZE * 2);
   }
   
   rect.setAttribute("x", x);
   rect.setAttribute("y", y);
   
-  // Маркер для удлинения
   const handle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
   handle.setAttribute("class", "resize-handle");
   handle.setAttribute("r", "6");
   
   if (orientation === 'wall-h') {
-    handle.setAttribute("cx", x + 100);
+    handle.setAttribute("cx", x + GRID_SIZE * 2);
     handle.setAttribute("cy", y + 3);
   } else {
     handle.setAttribute("cx", x + 3);
-    handle.setAttribute("cy", y + 100);
+    handle.setAttribute("cy", y + GRID_SIZE * 2);
   }
 
   g.appendChild(rect);
   g.appendChild(handle);
   contentLayer.appendChild(g);
   
-  // 1. Перемещение всей стены
+  // Перемещение
   rect.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
     const startX = e.clientX;
@@ -68,15 +69,19 @@ function createWall(x, y, orientation) {
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
       
-      rect.setAttribute("x", origX + dx);
-      rect.setAttribute("y", origY + dy);
+      // Прилипаем к сетке
+      const newX = snap(origX + dx);
+      const newY = snap(origY + dy);
+      
+      rect.setAttribute("x", newX);
+      rect.setAttribute("y", newY);
       
       if (orientation === 'wall-h') {
-        handle.setAttribute("cx", origX + dx + parseFloat(rect.getAttribute("width")));
-        handle.setAttribute("cy", origY + dy + 3);
+        handle.setAttribute("cx", newX + parseFloat(rect.getAttribute("width")));
+        handle.setAttribute("cy", newY + 3);
       } else {
-        handle.setAttribute("cx", origX + dx + 3);
-        handle.setAttribute("cy", origY + dy + parseFloat(rect.getAttribute("height")));
+        handle.setAttribute("cx", newX + 3);
+        handle.setAttribute("cy", newY + parseFloat(rect.getAttribute("height")));
       }
     }
 
@@ -89,7 +94,7 @@ function createWall(x, y, orientation) {
     window.addEventListener('pointerup', onUp);
   });
 
-  // 2. Удлинение стены за ручку
+  // Растягивание
   handle.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
     const startX = e.clientX;
@@ -103,11 +108,13 @@ function createWall(x, y, orientation) {
       const dy = e.clientY - startY;
       
       if (orientation === 'wall-h') {
-        const newWidth = Math.max(20, initialWidth + dx);
+        let newWidth = initialWidth + dx;
+        newWidth = Math.max(GRID_SIZE, snap(newWidth)); 
         rect.setAttribute("width", newWidth);
         handle.setAttribute("cx", parseFloat(rect.getAttribute("x")) + newWidth);
       } else {
-        const newHeight = Math.max(20, initialHeight + dy);
+        let newHeight = initialHeight + dy;
+        newHeight = Math.max(GRID_SIZE, snap(newHeight));
         rect.setAttribute("height", newHeight);
         handle.setAttribute("cy", parseFloat(rect.getAttribute("y")) + newHeight);
       }
@@ -123,7 +130,6 @@ function createWall(x, y, orientation) {
   });
 }
 
-// --- Создание знака ---
 function createSign(x, y, signType) {
   const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
   text.setAttribute("class", "sign");
@@ -133,12 +139,10 @@ function createSign(x, y, signType) {
   let symbol = '❓';
   if (signType === 'exit') symbol = '🚪';
   if (signType === 'extinguisher') symbol = '🧯';
-  if (signType === 'phone') symbol = '📞';
   
   text.textContent = symbol;
   contentLayer.appendChild(text);
 
-  // Перемещение знака
   text.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
     const startX = e.clientX;
@@ -149,8 +153,9 @@ function createSign(x, y, signType) {
     function onMove(e) {
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
-      text.setAttribute("x", origX + dx);
-      text.setAttribute("y", origY + dy);
+      
+      text.setAttribute("x", snap(origX + dx));
+      text.setAttribute("y", snap(origY + dy));
     }
 
     function onUp() {
@@ -163,7 +168,6 @@ function createSign(x, y, signType) {
   });
 }
 
-// Очистка холста
 clearBtn.addEventListener('click', () => {
   contentLayer.innerHTML = '';
 });
