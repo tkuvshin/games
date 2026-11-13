@@ -11,26 +11,38 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial
 .room { 
   width: 100%; 
   height: 400px; 
-  background: #ffffff; 
+  background: #e0e5ec; /* Цвет стены */
   border-radius: 16px; 
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
   position: relative; 
-  border: 2px solid #d1d9e6; 
+  border: 2px solid #c5cdd8; 
   overflow: hidden; 
   touch-action: none; 
 }
 
-/* Линия пола для понимания высоты */
+/* Имитация пола */
 .room::after {
-  content: ''; position: absolute; bottom: 40px; left: 0; right: 0; height: 4px; background: #e6eaf0; z-index: 1;
-}
-.room::before {
-  content: 'ПОЛ'; position: absolute; bottom: 15px; left: 10px; color: #a0aab8; font-size: 0.7rem; font-weight: bold;
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 30px; background: #bdc3c7; z-index: 1; border-top: 2px solid #95a5a6;
 }
 
-.door, .window { position: absolute; background: #e6eaf0; color: #6b7a90; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; font-weight: bold; z-index: 10; border: 2px solid #cfd6e0;}
-.door { bottom: 40px; left: 40%; width: 80px; height: 30px; border-radius: 8px 8px 0 0; }
-.window { top: 20px; right: 20px; width: 60px; height: 40px; border-radius: 4px; background: #b3e5fc; color: #0288d1; }
+/* Имитация потолка */
+.room::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 10px; background: #c5cdd8; z-index: 1;
+}
+
+.ceiling-label, .floor-label { position: absolute; left: 10px; font-size: 0.7rem; font-weight: bold; color: #7f8c8d; z-index: 2; }
+.ceiling-label { top: 15px; }
+.floor-label { bottom: 8px; }
+
+/* Дверной проем (стоит на полу) */
+.door { position: absolute; bottom: 30px; left: 40%; width: 80px; height: 180px; background: #95a5a6; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px; font-size: 0.7rem; color: white; font-weight: bold; z-index: 5; border: 2px solid #7f8c8d; border-bottom: none; }
+
+/* Окно (висит на стене) */
+.window { position: absolute; top: 100px; right: 20px; width: 100px; height: 80px; background: #81d4fa; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #0277bd; font-weight: bold; z-index: 5; border: 2px solid #4fc3f7; }
+
+/* Линия 1.5 метра */
+.height-mark { position: absolute; left: 0; right: 0; height: 2px; background: rgba(229, 57, 53, 0.5); border-top: 2px dashed #e53935; z-index: 3; }
+.height-mark span { position: absolute; right: 10px; top: -18px; font-size: 0.75rem; color: #e53935; font-weight: bold; background: #e0e5ec; padding: 0 5px; }
 
 .inventory { width: 100%; background: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 @media (min-width: 600px) { .inventory { width: 250px; flex-shrink: 0; } }
