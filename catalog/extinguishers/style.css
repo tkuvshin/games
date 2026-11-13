@@ -11,13 +11,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial
 .room { 
   width: 100%; 
   height: 400px; 
-  background: #e0e5ec; /* Цвет стены */
+  background: #e0e5ec; 
   border-radius: 16px; 
   box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
   position: relative; 
   border: 2px solid #c5cdd8; 
   overflow: hidden; 
-  touch-action: none; 
+  /* Убрали touch-action: none, чтобы на телефоне работал скролл */
+}
+
+/* Ограничиваем высоту комнаты на мобильных, чтобы влезал склад и кнопка */
+@media (max-width: 600px) {
+  .room { height: 300px; } /* Было 400, стало 300 */
 }
 
 /* Имитация пола */
@@ -34,8 +39,26 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial
 .ceiling-label { top: 15px; }
 .floor-label { bottom: 8px; }
 
-/* Дверной проем (стоит на полу) */
-.door { position: absolute; bottom: 30px; left: 40%; width: 80px; height: 180px; background: #95a5a6; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px; font-size: 0.7rem; color: white; font-weight: bold; z-index: 5; border: 2px solid #7f8c8d; border-bottom: none; }
+/* Дверной проем (стоит на полу) — текст по центру */
+.door { 
+  position: absolute; 
+  bottom: 30px; 
+  left: 40%; 
+  width: 80px; 
+  height: 180px; 
+  background: #95a5a6; 
+  display: flex; 
+  align-items: center; /* Выравниваем по центру по вертикали */
+  justify-content: center; /* Выравниваем по центру по горизонтали */
+  font-size: 0.7rem; 
+  color: white; 
+  font-weight: bold; 
+  z-index: 5; 
+  border: 2px solid #7f8c8d; 
+  border-bottom: none; 
+  text-align: center;
+  padding: 5px;
+}
 
 /* Окно (висит на стене) */
 .window { position: absolute; top: 100px; right: 20px; width: 100px; height: 80px; background: #81d4fa; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #0277bd; font-weight: bold; z-index: 5; border: 2px solid #4fc3f7; }
