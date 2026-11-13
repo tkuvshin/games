@@ -2,33 +2,22 @@ const canvas = document.getElementById('canvas');
 const contentLayer = document.getElementById('content-layer');
 const clearBtn = document.getElementById('clearBtn');
 
-// --- Логика Drag & Drop для ПК ---
+// --- Клик по инструменту -> появление элемента на холсте ---
 document.querySelectorAll('.tool').forEach(tool => {
-  tool.addEventListener('dragstart', (e) => {
-    e.dataTransfer.setData('text/plain', JSON.stringify({
-      type: tool.dataset.type,
-      sign: tool.dataset.sign
-    }));
+  tool.addEventListener('click', () => {
+    const type = tool.dataset.type;
+    const sign = tool.dataset.sign;
+
+    // Центр холста (с небольшим смещением, чтобы элементы не накладывались друг на друга)
+    const centerX = canvas.clientWidth / 2 + (Math.random() * 100 - 50);
+    const centerY = canvas.clientHeight / 2 + (Math.random() * 100 - 50);
+
+    if (type === 'wall-h' || type === 'wall-v') {
+      createWall(centerX, centerY, type);
+    } else if (type === 'sign') {
+      createSign(centerX, centerY, sign);
+    }
   });
-});
-
-canvas.addEventListener('dragover', (e) => e.preventDefault());
-
-canvas.addEventListener('drop', (e) => {
-  e.preventDefault();
-  const dataStr = e.dataTransfer.getData('text/plain');
-  if (!dataStr) return;
-  const data = JSON.parse(dataStr);
-  
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-
-  if (data.type === 'wall-h' || data.type === 'wall-v') {
-    createWall(x, y, data.type);
-  } else if (data.type === 'sign') {
-    createSign(x, y, data.sign);
-  }
 });
 
 // --- Создание стены ---
@@ -36,13 +25,12 @@ function createWall(x, y, orientation) {
   const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
   g.setAttribute("class", "wall-group");
   
-  // Сама стена (прямоугольник)
   const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
   rect.setAttribute("class", "wall");
   
   if (orientation === 'wall-h') {
     rect.setAttribute("width", "100");
-    rect.setAttribute("height", "6"); // Фиксированная толщина (4 мм условно)
+    rect.setAttribute("height", "6"); // Толщина 6px
   } else {
     rect.setAttribute("width", "6");
     rect.setAttribute("height", "100");
@@ -51,7 +39,7 @@ function createWall(x, y, orientation) {
   rect.setAttribute("x", x);
   rect.setAttribute("y", y);
   
-  // Маркер для удлинения (маленький кружок на конце)
+  // Маркер для удлинения
   const handle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
   handle.setAttribute("class", "resize-handle");
   handle.setAttribute("r", "6");
@@ -68,7 +56,7 @@ function createWall(x, y, orientation) {
   g.appendChild(handle);
   contentLayer.appendChild(g);
   
-  // Логика перемещения стены
+  // 1. Перемещение всей стены
   rect.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
     const startX = e.clientX;
@@ -83,13 +71,12 @@ function createWall(x, y, orientation) {
       rect.setAttribute("x", origX + dx);
       rect.setAttribute("y", origY + dy);
       
-      // Двигаем ручку вместе со стеной
       if (orientation === 'wall-h') {
-        handle.setAttribute("cx", origX + dx + 100);
+        handle.setAttribute("cx", origX + dx + parseFloat(rect.getAttribute("width")));
         handle.setAttribute("cy", origY + dy + 3);
       } else {
         handle.setAttribute("cx", origX + dx + 3);
-        handle.setAttribute("cy", origY + dy + 100);
+        handle.setAttribute("cy", origY + dy + parseFloat(rect.getAttribute("height")));
       }
     }
 
@@ -102,7 +89,7 @@ function createWall(x, y, orientation) {
     window.addEventListener('pointerup', onUp);
   });
 
-  // Логика удлинения стены (за ручку)
+  // 2. Удлинение стены за ручку
   handle.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
     const startX = e.clientX;
@@ -116,7 +103,7 @@ function createWall(x, y, orientation) {
       const dy = e.clientY - startY;
       
       if (orientation === 'wall-h') {
-        const newWidth = Math.max(20, initialWidth + dx); // Минимум 20px
+        const newWidth = Math.max(20, initialWidth + dx);
         rect.setAttribute("width", newWidth);
         handle.setAttribute("cx", parseFloat(rect.getAttribute("x")) + newWidth);
       } else {
@@ -143,7 +130,6 @@ function createSign(x, y, signType) {
   text.setAttribute("x", x);
   text.setAttribute("y", y);
   
-  // Тут мы пока используем эмодзи, потом заменим на твои SVG-знаки
   let symbol = '❓';
   if (signType === 'exit') symbol = '🚪';
   if (signType === 'extinguisher') symbol = '🧯';
