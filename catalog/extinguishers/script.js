@@ -22,9 +22,12 @@ function placeExtinguisher(data, x, y) {
 
   const rect = room.getBoundingClientRect();
   
+  // Высота комнаты может быть 400 (ПК) или 300 (мобилки)
+  const roomHeight = rect.height; 
+  
   // Пол начинается с 30px от низа. Считаем высоту от пола.
-  // Условно: 100px = 1 метр (тогда 1.5 метра = 150px)
-  const heightInPixels = 400 - 30 - y; 
+  // 100px = 1 метр (условно). 
+  const heightInPixels = roomHeight - 30 - y; 
   const heightMeters = heightInPixels / 100; 
   
   if (heightMeters > 1.5) {
@@ -33,7 +36,13 @@ function placeExtinguisher(data, x, y) {
   }
   
   // Проверка на дверь (дверь от 30px до 210px от низа, центр около 120px)
-  if (x > rect.width * 0.4 - 20 && x < rect.width * 0.4 + 100 && y > 400 - 210 && y < 400 - 30) {
+  // Дверь находится на 40% ширины стены
+  const doorLeft = rect.width * 0.4 - 20;
+  const doorRight = rect.width * 0.4 + 100;
+  const doorBottom = roomHeight - 30;
+  const doorTop = roomHeight - 210;
+  
+  if (x > doorLeft && x < doorRight && y > doorTop && y < doorBottom) {
     showStatus(`❌ Нарушение! Нельзя ставить прямо на дверной проем.`, 'error');
     return;
   }
@@ -88,6 +97,10 @@ inventoryItems.forEach(item => {
 
 room.addEventListener('pointerup', (e) => {
   if (!selectedItem || e.target.classList.contains('placed')) return;
+  
+  // Если пользователь просто скроллил страницу, а не тапнул — не ставим
+  // Для этого проверяем, что расстояние между touchstart и touchend небольшое (опционально, но можно пропустить)
+  
   placeExtinguisher(selectedItem, e.clientX - room.getBoundingClientRect().left, e.clientY - room.getBoundingClientRect().top);
   selectedItem = null;
   inventoryItems.forEach(i => i.style.borderColor = '#fdecea');
