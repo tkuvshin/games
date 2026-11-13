@@ -4,9 +4,48 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Игровой портал «Огонёк»</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Игровой портал «Огонёк»</h1>
-  <p>Портал на стадии разработки.</p>
+  <header class="header">
+    <div class="container">
+      <h1>Игровой портал <span class="accent">«Огонёк»</span></h1>
+      <p class="subtitle">Игры по пожарной безопасности</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="games-list" class="games-grid">
+      <!-- Карточки игр будут добавляться сюда из manifest.json -->
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© Огонёк. Игры по пожарной безопасности.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Загрузка каталога игр из манифеста
+    fetch('games/manifest.json')
+      .then(response => response.json())
+      .then(games => {
+        const container = document.getElementById('games-list');
+        games.forEach(game => {
+          const card = document.createElement('a');
+          card.href = game.path;
+          card.className = 'game-card';
+          card.innerHTML = `
+            <div class="game-icon">${game.icon || '🔥'}</div>
+            <h2>${game.title}</h2>
+            <p>${game.description}</p>
+            <span class="game-tag">${game.type === 'pro' ? 'Профессиональная' : 'Развлекательная'}</span>
+          `;
+          container.appendChild(card);
+        });
+      })
+      .catch(err => console.error('Ошибка загрузки каталога игр:', err));
+  </script>
 </body>
 </html>
