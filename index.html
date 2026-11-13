@@ -28,7 +28,7 @@
 
   <script>
     // Загрузка каталога игр из манифеста
-    fetch('games/manifest.json')
+    fetch('catalog/manifest.json')
       .then(response => response.json())
       .then(games => {
         const container = document.getElementById('games-list');
