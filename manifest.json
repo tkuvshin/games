@@ -1,0 +1,10 @@
+[
+  {
+    "id": "extinguishers",
+    "title": "Расставь огнетушители",
+    "description": "Расставьте огнетушители на плане помещения по правилам пожарной безопасности.",
+    "icon": "🧯",
+    "type": "pro",
+    "path": "games/extinguishers/index.html"
+  }
+]
